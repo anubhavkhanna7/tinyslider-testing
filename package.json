@@ -1,8 +1,8 @@
 {
-  "name": "tiny-slider-images",
+  "name": "tinyslider-testing",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://anubhavkhanna7.github.io/tiny-slider-images",
+  "homepage": "https://anubhavkhanna7.github.io/tinyslider-testing",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
