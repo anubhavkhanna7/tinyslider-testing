@@ -1,0 +1,18 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  margin-bottom: 20px;
+}
+
+/* Tiny Slider specific styles */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: auto; /* Center the images */
+}
