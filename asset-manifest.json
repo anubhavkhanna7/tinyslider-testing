@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/tiny-slider-images/static/css/main.6b383c78.css",
-    "main.js": "/tiny-slider-images/static/js/main.8420553a.js",
-    "static/js/453.dc5ced4c.chunk.js": "/tiny-slider-images/static/js/453.dc5ced4c.chunk.js",
-    "index.html": "/tiny-slider-images/index.html",
-    "main.6b383c78.css.map": "/tiny-slider-images/static/css/main.6b383c78.css.map",
-    "main.8420553a.js.map": "/tiny-slider-images/static/js/main.8420553a.js.map",
-    "453.dc5ced4c.chunk.js.map": "/tiny-slider-images/static/js/453.dc5ced4c.chunk.js.map"
+    "main.css": "/tinyslider-testing/static/css/main.6b383c78.css",
+    "main.js": "/tinyslider-testing/static/js/main.1446e0ec.js",
+    "static/js/453.60160451.chunk.js": "/tinyslider-testing/static/js/453.60160451.chunk.js",
+    "index.html": "/tinyslider-testing/index.html",
+    "main.6b383c78.css.map": "/tinyslider-testing/static/css/main.6b383c78.css.map",
+    "main.1446e0ec.js.map": "/tinyslider-testing/static/js/main.1446e0ec.js.map",
+    "453.60160451.chunk.js.map": "/tinyslider-testing/static/js/453.60160451.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.6b383c78.css",
-    "static/js/main.8420553a.js"
+    "static/js/main.1446e0ec.js"
   ]
 }
