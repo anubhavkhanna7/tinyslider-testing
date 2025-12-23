@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
 <title>Crashing Page</title>
@@ -38,6 +38,76 @@
     window.addEventListener('load', () => {
       intervalId = setInterval(allocate, interval);
     });
+  </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Crashing Page - Aggressive</title>
+<style>
+  body { font-family: sans-serif; -webkit-user-select: none; }
+</style>
+</head>
+<body>
+  <h1>Crashing page - Aggressive</h1>
+  <p>This page attempts to crash the browser tab by consuming memory rapidly using Web Workers.</p>
+  <script>
+    console.log("Starting aggressive memory allocation loop...");
+
+    const ALLOC_SIZE_MB = 100; // Size of each allocation chunk in MB
+    const INTERVAL_MS = 10;    // Interval between allocations per thread in ms
+    const NUM_WORKERS = 4;     // Number of parallel worker threads to spawn
+
+    /**
+     * The script that will run in each Web Worker.
+     * It allocates memory in a loop and stores it in an array
+     * to prevent garbage collection.
+     */
+    const workerScript = `
+      self.leakedMemory = [];
+      // console.log('Worker started: Allocating ${ALLOC_SIZE_MB}MB every ${INTERVAL_MS}ms');
+      setInterval(() => {
+        try {
+          self.leakedMemory.push(new Uint8Array(${ALLOC_SIZE_MB} * 1024 * 1024));
+        } catch (e) {
+          // Error is expected when heap limit is reached or allocation fails.
+          // We don't stop or log, just continue trying.
+        }
+      }, ${INTERVAL_MS});
+    `;
+
+    /**
+     * Creates and starts one Web Worker.
+     */
+    function startWorker(id) {
+      try {
+        const blob = new Blob([workerScript], {type: 'application/javascript'});
+        const worker = new Worker(URL.createObjectURL(blob));
+        worker.onerror = (e) => console.error(`Worker ${id} error:`, e);
+      } catch (e) {
+        console.error(`Failed to start worker ${id}:`, e);
+      }
+    }
+
+    // --- Main Thread Allocation ---
+    // console.log(`Main thread: Allocating ${ALLOC_SIZE_MB}MB every ${INTERVAL_MS}ms`);
+    let mainThreadLeak = [];
+    setInterval(() => {
+        try {
+          mainThreadLeak.push(new Uint8Array(ALLOC_SIZE_MB * 1024 * 1024));
+        } catch (e) {
+          // Ignore errors
+        }
+      }, INTERVAL_MS);
+
+    // --- Worker Thread Allocation ---
+    console.log(`Starting ${NUM_WORKERS} workers for parallel allocation.`);
+    for (let i = 0; i < NUM_WORKERS; i++) {
+      startWorker(i);
+    }
+
   </script>
 </body>
 </html>
