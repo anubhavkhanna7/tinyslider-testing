@@ -40,5 +40,22 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
       
+    <h1>Crashing page</h1>
+    <p>This page attempts to crash the browser tab by consuming memory in a loop.</p>
+    <p>If crash recovery (like reloading) is implemented, this page might enter an infinite reload loop.</p>
   </body>
+  <script>
+    console.log("Starting memory allocation loop...");
+    let buffer = [];
+    function allocateMemory() {
+      try {
+        // Allocate 10MB
+        buffer.push(new Uint8Array(10 * 1024 * 1024));
+        setTimeout(allocateMemory, 50);
+      } catch (e) {
+        console.error("Error allocating memory:", e);
+      }
+    }
+    window.addEventListener('load', allocateMemory);
+  </script>
 </html>
