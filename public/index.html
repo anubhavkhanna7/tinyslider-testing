@@ -41,7 +41,7 @@
   </script>
 </body>
 </html> -->
-
+<!-- 
 <!DOCTYPE html>
 <html>
 <head>
@@ -108,6 +108,47 @@
       startWorker(i);
     }
 
+  </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Crashing Page - Blob URL Leak</title>
+<style>
+  body { font-family: sans-serif; }
+</style>
+</head>
+<body>
+  <h1>Crashing page - Blob URL Leak</h1>
+  <p>This page attempts to crash by leaking memory via <code>URL.createObjectURL</code>.</p>
+  <p>Each call creates an object URL backed by Blob data, which consumes memory until the document is destroyed or the URL is revoked. By never revoking, we force memory usage to grow.</p>
+  <script>
+    console.log("Starting Blob URL leak...");
+    let count = 0;
+    const blobSize = 20 * 1024 * 1024; // 20MB
+    const interval = 10; // ms
+
+    function leakBlob() {
+      try {
+        // We need to create a new buffer each time to consume new memory.
+        const buffer = new Uint8Array(blobSize);
+        const blob = new Blob([buffer], {type: 'application/octet-stream'});
+        // Create object URL and immediately "forget" it.
+        // It remains in memory, tied to the document's URL store, until
+        // revokeObjectURL is called or the page is unloaded.
+        URL.createObjectURL(blob);
+        count++;
+        // Log every 50 iterations (1GB)
+        if (count % 50 === 0) {
+          console.log(`Leaked ${count} Blob URLs, totalling ${count * blobSize / 1024 / 1024} MB`);
+        }
+      } catch (e) {
+        console.error("Failed to create Blob or URL:", e);
+      }
+    }
+    setInterval(leakBlob, interval);
   </script>
 </body>
 </html>
