@@ -154,7 +154,7 @@
 </html> -->
 
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
 <title>Crashing Page - Blob URL Leak</title>
@@ -192,5 +192,144 @@
   <h1>Crashing page - Blob URL Leak</h1>
   <p>This page attempts to crash by leaking memory via <code>URL.createObjectURL</code>.</p>
   <p>Each call creates an object URL backed by Blob data, which consumes memory until the document is destroyed or the URL is revoked. By never revoking, we force memory usage to grow.</p>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Crashing Page</title>
+<style>
+  body { font-family: sans-serif; }
+  .tabs { margin-bottom: 10px; }
+  .tabs button { padding: 10px; cursor: pointer; }
+  .tabs button.active { background-color: #ccc; font-weight: bold; }
+  .tab-content { display: none; border: 1px solid #ccc; padding: 10px; margin-top: -1px;}
+  .tab-content.active { display: block; }
+  #indicator {
+    width: 20px;
+    height: 20px;
+    background-color: green;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+    margin-top: 10px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+  }
+  #interaction-button {
+    padding: 8px 12px;
+    margin-left: 10px;
+  }
+</style>
+</head>
+<body>
+  <h1>Crashing page</h1>
+  <p>This page attempts to crash in multiple ways. The blinking dot indicates if page is responsive.</p>
+  <div>
+    <div id="indicator" title="If blinking, page is responsive"></div>
+    Responsive check: <span id="timer">0</span>s
+    <button id="interaction-button">Click to change color</button>
+  </div>
+
+  <div class="tabs">
+    <button id="tab1-btn" class="tab-btn active">PostMessage Flood</button>
+    <button id="tab2-btn" class="tab-btn">History Flood</button>
+    <button id="tab3-btn" class="tab-btn">Memory Leak</button>
+  </div>
+
+  <div id="tab1-content" class="tab-content active">
+    <h2>PostMessage Flood</h2>
+    <p>Floods postMessage with large blobs to exhaust IPC or memory.</p>
+    <button onclick="startPostMessageFlood(this)">Start</button>
+  </div>
+
+  <div id="tab2-content" class="tab-content">
+    <h2>History Flood</h2>
+    <p>Calls history.pushState in an infinite loop. This will hang the page.</p>
+    <button onclick="startHistoryFlood(this)">Start</button>
+  </div>
+
+  <div id="tab3-content" class="tab-content">
+    <h2>Memory Leak</h2>
+    <p>Continuously allocates large ArrayBuffers to exhaust memory.</p>
+    <button onclick="startMemoryLeak(this)">Start</button>
+  </div>
+
+<script>
+  // --- Responsiveness checks ---
+  let time = 0;
+  setInterval(() => {
+    time++;
+    document.getElementById('timer').innerText = time;
+  }, 1000);
+
+  const interactionButton = document.getElementById('interaction-button');
+  interactionButton.onclick = () => {
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+    interactionButton.style.backgroundColor = randomColor;
+    interactionButton.style.color = '#000';
+  };
+
+  // --- Tab logic ---
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', (event) => {
+      const tabId = event.target.id; // e.g. tab1-btn
+      const contentId = tabId.replace('-btn', '-content'); // e.g. tab1-content
+
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(contentId).classList.add('active');
+    });
+  });
+
+  // --- Crash methods ---
+
+  // 1. PostMessage Flood
+  function startPostMessageFlood(btn) {
+    btn.disabled = true;
+    btn.innerText = 'Running...';
+    console.log('Starting PostMessage flood...');
+    var blob = new Blob([new ArrayBuffer(1024*1024*10)]);
+    function bombe(){
+      window.postMessage(blob,"*");
+    }
+    window.addEventListener('message', bombe);
+    bombe();
+  }
+
+  // 2. History Flood
+  function startHistoryFlood(btn) {
+    btn.disabled = true;
+    btn.innerText = 'Running...';
+    console.log('Starting History flood...');
+    while(true) {
+      history.pushState({}, '');
+    }
+  }
+
+  // 3. Memory Leak
+  let leaks = [];
+  function startMemoryLeak(btn) {
+    btn.disabled = true;
+    btn.innerText = 'Running...';
+    console.log('Starting memory leak...');
+    function leak() {
+      leaks.push(new ArrayBuffer(1024*1024*10)); // 10MB
+      setTimeout(leak, 50);
+    }
+    leak();
+  }
+
+</script>
 </body>
 </html>
