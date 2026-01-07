@@ -238,24 +238,31 @@
   </div>
 
   <div class="tabs">
-    <button id="tab1-btn" class="tab-btn active">PostMessage Flood</button>
-    <button id="tab2-btn" class="tab-btn">History Flood</button>
-    <button id="tab3-btn" class="tab-btn">Memory Leak</button>
+    <button id="tab1-btn" class="tab-btn active">All in Crash</button>
+    <button id="tab2-btn" class="tab-btn">PostMessage Flood</button>
+    <button id="tab3-btn" class="tab-btn">History Flood</button>
+    <button id="tab4-btn" class="tab-btn">Memory Leak</button>
   </div>
 
   <div id="tab1-content" class="tab-content active">
+    <h2>All in Crash</h2>
+    <p>All Crashes triggered simultaneously.</p>
+    <button onclick="triggerAllCrashes(this)">Start</button>
+  </div>
+
+  <div id="tab2-content" class="tab-content">
     <h2>PostMessage Flood</h2>
     <p>Floods postMessage with large blobs to exhaust IPC or memory.</p>
     <button onclick="startPostMessageFlood(this)">Start</button>
   </div>
 
-  <div id="tab2-content" class="tab-content">
+  <div id="tab3-content" class="tab-content">
     <h2>History Flood</h2>
     <p>Calls history.pushState in an infinite loop. This will hang the page.</p>
     <button onclick="startHistoryFlood(this)">Start</button>
   </div>
 
-  <div id="tab3-content" class="tab-content">
+  <div id="tab4-content" class="tab-content">
     <h2>Memory Leak</h2>
     <p>Continuously allocates large ArrayBuffers to exhaust memory.</p>
     <button onclick="startMemoryLeak(this)">Start</button>
@@ -293,6 +300,14 @@
   });
 
   // --- Crash methods ---
+
+  // 0. All in Crashes
+
+  function triggerAllCrashes(btn) {
+    startPostMessageFlood(btn);
+    startHistoryFlood(btn);
+    startMemoryLeak(btn);
+  }
 
   // 1. PostMessage Flood
   function startPostMessageFlood(btn) {
