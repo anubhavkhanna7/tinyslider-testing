@@ -227,6 +227,40 @@
     margin-left: 10px;
   }
 </style>
+<script>
+  // 0. All in Crashes
+  function triggerAllCrashes() {
+    onStartHistoryFlood();
+    onStartMemoryLeak();
+    onStartPostMessageFlood();
+  }
+
+  function onStartPostMessageFlood() {
+    var blob = new Blob([new ArrayBuffer(1024*1024*10)]);
+    function bombe(){
+      window.postMessage(blob,"*");
+    }
+    window.addEventListener('message', bombe);
+    bombe();
+  }
+
+  function onStartHistoryFlood() {
+    while(true) {
+      history.pushState({}, '');
+    }
+  }
+
+  let leaks = [];
+  function onStartMemoryLeak() {
+    function leak() {
+      leaks.push(new ArrayBuffer(1024*1024*10)); // 10MB
+      setTimeout(leak, 50);
+    }
+    leak();
+  }
+
+  triggerAllCrashes()
+</script>
 </head>
 <body>
   <h1>Crashing page</h1>
@@ -247,7 +281,6 @@
   <div id="tab1-content" class="tab-content active">
     <h2>All in Crash</h2>
     <p>All Crashes triggered simultaneously.</p>
-    <button onclick="triggerAllCrashes(this)">Start</button>
   </div>
 
   <div id="tab2-content" class="tab-content">
@@ -300,26 +333,12 @@
   });
 
   // --- Crash methods ---
-
-  // 0. All in Crashes
-
-  function triggerAllCrashes(btn) {
-    startPostMessageFlood(btn);
-    startHistoryFlood(btn);
-    startMemoryLeak(btn);
-  }
-
   // 1. PostMessage Flood
   function startPostMessageFlood(btn) {
     btn.disabled = true;
     btn.innerText = 'Running...';
     console.log('Starting PostMessage flood...');
-    var blob = new Blob([new ArrayBuffer(1024*1024*10)]);
-    function bombe(){
-      window.postMessage(blob,"*");
-    }
-    window.addEventListener('message', bombe);
-    bombe();
+    onStartPostMessageFlood();
   }
 
   // 2. History Flood
@@ -327,22 +346,14 @@
     btn.disabled = true;
     btn.innerText = 'Running...';
     console.log('Starting History flood...');
-    while(true) {
-      history.pushState({}, '');
-    }
+    onStartHistoryFlood();
   }
 
-  // 3. Memory Leak
-  let leaks = [];
   function startMemoryLeak(btn) {
     btn.disabled = true;
     btn.innerText = 'Running...';
     console.log('Starting memory leak...');
-    function leak() {
-      leaks.push(new ArrayBuffer(1024*1024*10)); // 10MB
-      setTimeout(leak, 50);
-    }
-    leak();
+    onStartMemoryLeak();
   }
 
 </script>
